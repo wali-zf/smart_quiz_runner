@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Questions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #4f46e5; --surface: #ffffff; --bg: #f9fafb; --text: #111827; --border: #e5e7eb; --danger: #ef4444; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0; padding: 2rem; color: var(--text); }
+        
+        .header { max-width: 1200px; margin: 0 auto 1.5rem auto; display: flex; align-items: center; }
+        .back-link { text-decoration: none; color: #6b7280; font-weight: 500; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
+        .back-link:hover { color: var(--text); }
+
+        .layout { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 350px 1fr; gap: 2rem; }
+        
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .card-header { background: #f3f4f6; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+        .card-body { padding: 1.5rem; }
+
+        /* List Styles */
+        .q-list { list-style: none; padding: 0; margin: 0; max-height: calc(100vh - 150px); overflow-y: auto; }
+        .q-item { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); position: relative; transition: background 0.1s; }
+        .q-item:hover { background: #f9fafb; }
+        .badge { font-size: 0.7rem; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; background: #e5e7eb; color: #4b5563; font-weight: 600; display: inline-block; margin-bottom: 0.5rem; }
+        .q-text { font-size: 0.95rem; font-weight: 500; line-height: 1.4; display: block; margin-bottom: 0.5rem; }
+        .q-ans { font-size: 0.85rem; color: #059669; font-weight: 500; }
+        
+        .btn-delete { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: #9ca3af; cursor: pointer; padding: 4px; }
+        .btn-delete:hover { color: var(--danger); background: #fee2e2; border-radius: 4px; }
+
+        /* Form Styles */
+        .form-group { margin-bottom: 1.25rem; }
+        label { display: block; font-weight: 500; font-size: 0.875rem; margin-bottom: 0.5rem; }
+        input, select, textarea { width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; font-size: 0.95rem; box-sizing: border-box; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); ring: 2px solid #e0e7ff; }
+        
+        .btn-primary { width: 100%; background: var(--primary); color: white; padding: 0.75rem; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .btn-primary:hover { background: #4338ca; }
+
+        .hidden { display: none; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="/dashboard" class="back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back to Dashboard
+        </a>
+    </div>
+    
+    <div class="layout">
+        <!-- Question List -->
+        <div class="card">
+            <div class="card-header">
+                <span>Questions</span>
+                <span style="font-size:0.8rem; background:var(--primary); color:white; padding:2px 8px; border-radius:10px;">{{ questions|length }}</span>
+            </div>
+            <ul class="q-list">
+                {% for q in questions %}
+                <li class="q-item">
+                    <span class="badge">{{ q['question_type'] }}</span>
+                    <span class="q-text">{{ loop.index }}. {{ q['question_text'] }}</span>
+                    {% if q['image_path'] %}
+                        <div style="font-size:0.75rem; color:#3b82f6; margin-bottom:4px;">📷 Image Attached</div>
+                    {% endif %}
+                    <div class="q-ans">✓ {{ q['correct_answer'] }}</div>
+                    <form action="/delete_question/{{ q['id'] }}" method="POST" onsubmit="return confirm('Delete?');">
+                        <button class="btn-delete" title="Delete Question">✕</button>
+                    </form>
+                </li>
+                {% else %}
+                <li style="padding:2rem; text-align:center; color:#9ca3af; font-style:italic;">No questions added yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Editor -->
+        <div class="card">
+            <div class="card-header">Editor</div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <div style="background:#d1fae5; color:#065f46; padding:0.75rem; border-radius:6px; margin-bottom:1.5rem; font-size:0.9rem;">{{ messages[0] }}</div>
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>Question Type</label>
+                        <select name="question_type" id="typeSelector" onchange="toggleFields()">
+                            <option value="mcq">Multiple Choice (MCQ)</option>
+                            <option value="true_false">True / False</option>
+                            <option value="text">Short Answer (Text)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Question Text</label>
+                        <textarea name="question_text" rows="3" required placeholder="Enter your question..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Image Attachment (Optional)</label>
+                        <input type="file" name="question_image" accept="image/*" style="padding: 6px; background: #f9fafb;">
+                    </div>
+
+                    <!-- MCQ Fields -->
+                    <div id="mcqSection">
+                        <label>Options (Leave empty to hide)</label>
+                        <div class="grid-2 form-group">
+                            <input type="text" name="option1" placeholder="Option A">
+                            <input type="text" name="option2" placeholder="Option B">
+                            <input type="text" name="option3" placeholder="Option C">
+                            <input type="text" name="option4" placeholder="Option D">
+                        </div>
+                        <div class="form-group">
+                            <label>Correct Answer</label>
+                            <select name="correct_answer_mcq">
+                                <option value="Option A">Option A</option>
+                                <option value="Option B">Option B</option>
+                                <option value="Option C">Option C</option>
+                                <option value="Option D">Option D</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- TF Fields -->
+                    <div id="tfSection" class="hidden">
+                        <div class="form-group">
+                            <label>Correct Answer</label>
+                            <select name="correct_answer_tf">
+                                <option value="True">True</option>
+                                <option value="False">False</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Text Fields -->
+                    <div id="textSection" class="hidden">
+                        <div class="form-group">
+                            <label>Correct Answer Key (Case Insensitive)</label>
+                            <input type="text" name="correct_answer_text" placeholder="e.g. Gravity">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Add Question</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleFields() {
+            const type = document.getElementById('typeSelector').value;
+            document.getElementById('mcqSection').classList.add('hidden');
+            document.getElementById('tfSection').classList.add('hidden');
+            document.getElementById('textSection').classList.add('hidden');
+
+            if (type === 'mcq') document.getElementById('mcqSection').classList.remove('hidden');
+            else if (type === 'true_false') document.getElementById('tfSection').classList.remove('hidden');
+            else if (type === 'text') document.getElementById('textSection').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

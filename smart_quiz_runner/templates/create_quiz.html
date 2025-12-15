@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create New Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #4f46e5; --surface: #ffffff; --background: #f9fafb; --text-main: #111827; --text-secondary: #6b7280; --border: #e5e7eb; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--background); margin: 0; padding: 2rem; color: var(--text-main); }
+        
+        .container { max-width: 640px; margin: 0 auto; background: var(--surface); padding: 2.5rem; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        
+        h2 { margin-top: 0; font-size: 1.5rem; font-weight: 700; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+        
+        .form-group { margin-bottom: 1.5rem; }
+        label { display: block; font-weight: 500; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-main); }
+        input[type="text"], input[type="number"], input[type="datetime-local"] { width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; box-sizing: border-box; font-family: inherit; }
+        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        
+        .toggle-card { background: #f3f4f6; padding: 1rem; border-radius: 8px; display: flex; align-items: center; gap: 0.75rem; border: 1px solid var(--border); cursor: pointer; }
+        .toggle-card input { width: auto; margin: 0; accent-color: var(--primary); transform: scale(1.2); }
+        .toggle-card label { margin: 0; cursor: pointer; }
+        
+        .actions { margin-top: 2.5rem; display: flex; gap: 1rem; }
+        .btn-primary { flex: 2; background: var(--primary); color: white; border: none; padding: 0.875rem; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.95rem; }
+        .btn-secondary { flex: 1; text-align: center; text-decoration: none; color: var(--text-main); padding: 0.875rem; background: white; border: 1px solid var(--border); border-radius: 6px; font-weight: 500; font-size: 0.95rem; }
+        .btn-secondary:hover { background: #f9fafb; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Create Assessment</h2>
+        <form method="POST">
+            <div class="form-group">
+                <label>Quiz Title</label>
+                <input type="text" name="title" placeholder="e.g. Advanced Mathematics Final" required>
+            </div>
+            
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Time Limit (Minutes)</label>
+                    <input type="number" name="time_limit" placeholder="0" min="0" value="0">
+                    <span style="font-size: 0.75rem; color: var(--text-secondary);">Set to 0 for unlimited time.</span>
+                </div>
+                <div class="form-group">
+                    <label>Passing Score (%)</label>
+                    <input type="number" name="passing_score" value="50" min="0" max="100">
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Deadline (Optional)</label>
+                    <input type="datetime-local" name="deadline">
+                </div>
+                <div class="form-group">
+                    <label>Max Attempts</label>
+                    <input type="number" name="max_attempts" value="0" min="0">
+                    <span style="font-size: 0.75rem; color: var(--text-secondary);">0 for unlimited attempts.</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="toggle-card">
+                    <input type="checkbox" name="strict_mode" id="strict">
+                    <label for="strict">Enable Strict Mode (Anti-Cheating Detection)</label>
+                </div>
+            </div>
+
+            <div class="actions">
+                <a href="/dashboard" class="btn-secondary">Cancel</a>
+                <button type="submit" class="btn-primary">Create Quiz</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
