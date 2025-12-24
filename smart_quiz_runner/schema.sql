@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS quizzes;
 DROP TABLE IF EXISTS questions;
 DROP TABLE IF EXISTS results;
 
--- 1. Users Table (Stores students and teachers)
+
 CREATE TABLE users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE users (
     role TEXT NOT NULL CHECK(role IN ('student', 'teacher'))
 );
 
--- 2. Quizzes Table (Created by teachers)
+
 CREATE TABLE quizzes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
@@ -19,8 +19,8 @@ CREATE TABLE quizzes (
     FOREIGN KEY (creator_id) REFERENCES users (id)
 );
 
--- 3. Questions Table (Linked to quizzes)
--- Options should be stored as a JSON string or separated by pipes like "Option A|Option B|Option C"
+
+
 CREATE TABLE questions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     quiz_id INTEGER NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE questions (
     FOREIGN KEY (quiz_id) REFERENCES quizzes (id)
 );
 
--- 4. Results Table (Stores student scores)
+
 CREATE TABLE results (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
@@ -41,5 +41,7 @@ CREATE TABLE results (
     FOREIGN KEY (quiz_id) REFERENCES quizzes (id)
 );
 
--- Optional: Insert a default teacher account (password: admin123)
+
+
 INSERT INTO users (username, password, role) VALUES ('admin', 'admin123', 'teacher');
+INSERT INTO users (username, password, role) VALUES ('wali', 'wali123', 'student');
