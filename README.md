@@ -118,3 +118,7 @@ Class Leaderboard for every quiz.
 Statistics: Total Attempts, Class Average, Highest Score.
 
 Export Results to CSV (Excel compatible).
+
+DISCLAIMER
+
+This project is a result of collaborative teamwork and includes assistance from AI tools. It is not the sole work of a single individual.
