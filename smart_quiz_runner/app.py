@@ -12,18 +12,18 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.secret_key = 'super_secret_key_for_quiz_app'
 
-# Configure Uploads
+
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Ensure upload directory exists
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# --- Database Helper Functions ---
+
 def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
@@ -38,10 +38,10 @@ def init_db():
         print("Database initialized!")
 
 def check_schema_updates():
-    """Automatically adds new columns for the upgrade."""
+    
     conn = get_db_connection()
     
-    # Quiz Table Updates
+    
     quiz_cols = {
         'time_limit': 'INTEGER DEFAULT 0',
         'strict_mode': 'INTEGER DEFAULT 0',
@@ -55,7 +55,7 @@ def check_schema_updates():
         except sqlite3.OperationalError:
             conn.execute(f'ALTER TABLE quizzes ADD COLUMN {col} {dtype}')
 
-    # User Table Updates (Profile)
+    
     user_cols = {
         'full_name': 'TEXT',
         'profile_image': 'TEXT'
@@ -66,7 +66,7 @@ def check_schema_updates():
         except sqlite3.OperationalError:
             conn.execute(f'ALTER TABLE users ADD COLUMN {col} {dtype}')
 
-    # Question Table Updates (Images & Types)
+    
     q_cols = {
         'question_type': "TEXT DEFAULT 'mcq'", # mcq, true_false, text
         'image_path': 'TEXT'
@@ -80,7 +80,7 @@ def check_schema_updates():
     conn.commit()
     conn.close()
 
-# --- Auth & Profile ---
+
 
 @app.route('/')
 def home():
@@ -134,7 +134,7 @@ def profile():
             conn.execute('UPDATE users SET full_name = ? WHERE id = ?', (full_name, session['user_id']))
             session['full_name'] = full_name # Update session
 
-        # 2. Handle Image Upload
+       
         if 'profile_image' in request.files:
             file = request.files['profile_image']
             if file and allowed_file(file.filename):
@@ -143,7 +143,7 @@ def profile():
                 conn.execute('UPDATE users SET profile_image = ? WHERE id = ?', (filename, session['user_id']))
                 session['profile_image'] = filename
 
-        # 3. Update Password
+        
         if request.form.get('new_password'):
             current_pass = request.form.get('current_password')
             user = conn.execute('SELECT password FROM users WHERE id = ?', (session['user_id'],)).fetchone()
@@ -166,7 +166,7 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
-# --- Quiz Logic ---
+
 
 @app.route('/dashboard')
 def dashboard():
@@ -232,7 +232,7 @@ def delete_quiz(quiz_id):
     conn.close()
     return redirect(url_for('dashboard'))
 
-# --- Advanced Question Management ---
+
 
 @app.route('/quiz/<int:quiz_id>/questions', methods=('GET', 'POST'))
 def manage_questions(quiz_id):
@@ -243,7 +243,7 @@ def manage_questions(quiz_id):
         q_type = request.form['question_type']
         q_text = request.form['question_text']
         
-        # Handle Image
+       
         image_path = None
         if 'question_image' in request.files:
             file = request.files['question_image']
@@ -252,17 +252,17 @@ def manage_questions(quiz_id):
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 image_path = filename
 
-        # Handle Options based on Type
+        
         options = ""
         correct_answer = ""
 
         if q_type == 'mcq':
-            # Collect non-empty options
+            
             opts = [request.form.get(f'option{i}') for i in range(1, 5)]
             opts = [o for o in opts if o and o.strip()] # Remove empty
             options = "|".join(opts)
             
-            # Map "Option A/B/C/D" to real value
+          
             sel = request.form.get('correct_answer_mcq')
             idx_map = {'Option A':0, 'Option B':1, 'Option C':2, 'Option D':3}
             if sel in idx_map and idx_map[sel] < len(opts):
@@ -299,7 +299,7 @@ def delete_question(question_id):
     conn.close()
     return redirect(url_for('manage_questions', quiz_id=q['quiz_id']))
 
-# --- Taking Quiz (Updated for Types) ---
+
 
 @app.route('/take_quiz/<int:quiz_id>', methods=['GET', 'POST'])
 def take_quiz(quiz_id):
@@ -307,7 +307,7 @@ def take_quiz(quiz_id):
     conn = get_db_connection()
     quiz = conn.execute('SELECT * FROM quizzes WHERE id=?', (quiz_id,)).fetchone()
     
-    # Checks (Deadline, Attempts)
+    
     if quiz['deadline'] and datetime.now().strftime('%Y-%m-%dT%H:%M') > quiz['deadline']:
         conn.close(); flash('Quiz Expired'); return redirect(url_for('dashboard'))
     if quiz['max_attempts'] > 0:
@@ -325,13 +325,13 @@ def take_quiz(quiz_id):
             correct_ans = q['correct_answer']
             is_correct = False
             
-            # Smart Grading
+            
             if q['question_type'] == 'text':
                 # Case insensitive comparison for text answers
                 if user_ans.lower() == correct_ans.lower():
                     is_correct = True
             else:
-                # Exact match for MCQ/TF
+                
                 if user_ans == correct_ans:
                     is_correct = True
             
@@ -359,7 +359,7 @@ def take_quiz(quiz_id):
     
     return render_template('take_quiz.html', quiz=quiz, questions=questions)
 
-# --- Reporting ---
+
 @app.route('/quiz/<int:quiz_id>/results')
 def view_results(quiz_id):
     if session.get('role') != 'teacher': return redirect(url_for('dashboard'))
@@ -395,4 +395,5 @@ if __name__ == '__main__':
     init_db()
     check_schema_updates()
     Timer(1, lambda: webbrowser.open_new('http://127.0.0.1:5000/')).start()
+
     app.run(debug=True)
