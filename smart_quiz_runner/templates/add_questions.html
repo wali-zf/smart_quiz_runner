@@ -59,21 +59,21 @@
                 <span style="font-size:0.8rem; background:var(--primary); color:white; padding:2px 8px; border-radius:10px;">{{ questions|length }}</span>
             </div>
             <ul class="q-list">
-                {% for q in questions %}
+               
                 <li class="q-item">
                     <span class="badge">{{ q['question_type'] }}</span>
                     <span class="q-text">{{ loop.index }}. {{ q['question_text'] }}</span>
-                    {% if q['image_path'] %}
+                 
                         <div style="font-size:0.75rem; color:#3b82f6; margin-bottom:4px;">📷 Image Attached</div>
-                    {% endif %}
+                  
                     <div class="q-ans">✓ {{ q['correct_answer'] }}</div>
                     <form action="/delete_question/{{ q['id'] }}" method="POST" onsubmit="return confirm('Delete?');">
                         <button class="btn-delete" title="Delete Question">✕</button>
                     </form>
                 </li>
-                {% else %}
+               
                 <li style="padding:2rem; text-align:center; color:#9ca3af; font-style:italic;">No questions added yet.</li>
-                {% endfor %}
+                
             </ul>
         </div>
 
@@ -163,4 +163,5 @@
 </body>
 
 </html>
+
 
