@@ -119,6 +119,6 @@ Statistics: Total Attempts, Class Average, Highest Score.
 
 Export Results to CSV (Excel compatible).
 
-DISCLAIMER
+<h3>DISCLAIMER</h3>
 
 This project is a result of collaborative teamwork and includes assistance from AI tools. It is not the sole work of a single individual.
