@@ -18,7 +18,7 @@
         .card-header { background: #f3f4f6; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
         .card-body { padding: 1.5rem; }
 
-        /* List Styles */
+        
         .q-list { list-style: none; padding: 0; margin: 0; max-height: calc(100vh - 150px); overflow-y: auto; }
         .q-item { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); position: relative; transition: background 0.1s; }
         .q-item:hover { background: #f9fafb; }
@@ -29,7 +29,7 @@
         .btn-delete { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: #9ca3af; cursor: pointer; padding: 4px; }
         .btn-delete:hover { color: var(--danger); background: #fee2e2; border-radius: 4px; }
 
-        /* Form Styles */
+       
         .form-group { margin-bottom: 1.25rem; }
         label { display: block; font-weight: 500; font-size: 0.875rem; margin-bottom: 0.5rem; }
         input, select, textarea { width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; font-size: 0.95rem; box-sizing: border-box; }
@@ -52,7 +52,7 @@
     </div>
     
     <div class="layout">
-        <!-- Question List -->
+        
         <div class="card">
             <div class="card-header">
                 <span>Questions</span>
@@ -77,7 +77,7 @@
             </ul>
         </div>
 
-        <!-- Editor -->
+       
         <div class="card">
             <div class="card-header">Editor</div>
             <div class="card-body">
@@ -107,7 +107,7 @@
                         <input type="file" name="question_image" accept="image/*" style="padding: 6px; background: #f9fafb;">
                     </div>
 
-                    <!-- MCQ Fields -->
+                    
                     <div id="mcqSection">
                         <label>Options (Leave empty to hide)</label>
                         <div class="grid-2 form-group">
@@ -127,7 +127,7 @@
                         </div>
                     </div>
 
-                    <!-- TF Fields -->
+                   
                     <div id="tfSection" class="hidden">
                         <div class="form-group">
                             <label>Correct Answer</label>
@@ -138,7 +138,7 @@
                         </div>
                     </div>
 
-                    <!-- Text Fields -->
+                    
                     <div id="textSection" class="hidden">
                         <div class="form-group">
                             <label>Correct Answer Key (Case Insensitive)</label>
@@ -165,4 +165,5 @@
         }
     </script>
 </body>
+
 </html>
